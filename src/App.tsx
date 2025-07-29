@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [city, setCity] = useState('');
+
+  const handleSearch = () => {
+    //STEP3で実装
+    console.log('Searching for:', city);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="APP">
+      <h1>天気予報アプリ</h1>
+      <div className="form">
+      <input
+        type="text"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+        placeholder="福岡"
+      />
+      <button onClick={handleSearch}>検索</button>    
+    </div>
+    /*↓ここに天気の結果が表示される*/
+    <div className="weather-result">
+      <h2>福岡</h2>
+      <p>天気：</p>
+      <p>気温: ℃</p>
+    </div>
+      /*↑ここまでが天気の結果表示エリア*/
+  </div>
+  );
 }
 
-export default App
+export default App;
