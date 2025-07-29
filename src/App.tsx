@@ -17,13 +17,13 @@ function App() {
         type="text"
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="福岡"
+        placeholder="Fukuoka,JP"
       />
       <button onClick={handleSearch}>検索</button>    
     </div>
     /*↓ここに天気の結果が表示される*/
     <div className="weather-result">
-      <h2>福岡</h2>
+      <h2>都市名</h2>
       <p>天気：</p>
       <p>気温: ℃</p>
     </div>
