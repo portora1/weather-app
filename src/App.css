@@ -17,6 +17,8 @@
 
 .form button {
   padding: 8px 15px;
+  color: #ffffff;
+  background-color: #6c6c6c;
 }
 
 .weather-result {
