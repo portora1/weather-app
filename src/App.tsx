@@ -36,19 +36,23 @@ function App() {
       setWeatherData(null);
     }
   };
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
+  };
 
   return (
     <div className="App">
       <h1>天気予報アプリ</h1>
-      <div className="form">
+      <form className="form" onSubmit={handleFormSubmit}>
       <input
         type="text"
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="Fukuoka,JP"
+        placeholder="都市名を入力してください"
       />
-      <button onClick={handleSearch}>検索</button>
-      </div>
+      <button type="submit">検索</button>
+      </form>
     {weatherData ? (
     <div className="weather-result">
       <h2>都市名:{weatherData.name}</h2>
