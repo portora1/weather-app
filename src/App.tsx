@@ -24,21 +24,28 @@ function App() {
     return saveFavorites ? JSON.parse(saveFavorites) : [];
   });
 
+  const [error, setError] = useState<string | null>(null);
+
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
   const handleSearch = async(searchCity: string) => {
     if(!searchCity) return;
+    setError(null);
+    setWeatherData(null);
 
     const URL = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${API_KEY}&units=metric&lang=ja`;
 
     try {
       const response = await fetch(URL);
+      if(!response.ok) {
+      throw new Error ('都市が見つかりませんでした');
+      }
       const data: WeatherData = await response.json();
       setWeatherData(data);
       console.log(data);
     } catch (error) {
       console.error("天気情報の取得に失敗しました:", error);
-      setWeatherData(null);
+      setError("都市が見つかりませんでした。入力内容を確認して再度お試しください。");
     }
   };
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -90,6 +97,7 @@ function App() {
               <p>お気に入りの都市はありません。</p>
             )}
       </div>
+      {error && <p className="error-massage">{error}</p>}
     {weatherData ? (
     <div className="weather-result">
       <h2>都市名:{weatherData.name}</h2>

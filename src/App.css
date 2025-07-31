@@ -28,3 +28,9 @@
   display: inline-block;
   min-width: 300px;
 }
+
+.error-message {
+  color: #d32f2f;
+  font-weight: bold;
+  margin-top: 20px;
+}
