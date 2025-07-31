@@ -97,7 +97,7 @@ function App() {
               <p>お気に入りの都市はありません。</p>
             )}
       </div>
-      {error && <p className="error-massage">{error}</p>}
+      {error && <p className="error-message">{error}</p>}
     {weatherData ? (
     <div className="weather-result">
       <h2>都市名:{weatherData.name}</h2>
