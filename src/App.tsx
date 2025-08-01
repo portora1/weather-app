@@ -1,9 +1,9 @@
+// sec/App.tsx
 import { useEffect, useState } from "react";
 import './App.css';
+import { WeatherCard } from './components/WeatherCard';
 
-// APIから返ってくるデータの内使うものだけ定義
-
-type WeatherData = {
+export type WeatherData = {
   name: string;
   main: {
     temp: number;
@@ -53,7 +53,7 @@ function App() {
     handleSearch(city);
   };
 
-  const handleAddToFavorites = () => {
+    const handleAddToFavorites = () => {
     if (!weatherData) return;
     if(!favorites.includes(weatherData.name)) {
       setFavorites([...favorites, weatherData.name]);
@@ -99,16 +99,11 @@ function App() {
       </div>
       {error && <p className="error-message">{error}</p>}
     {weatherData ? (
-    <div className="weather-result">
-      <h2>都市名:{weatherData.name}</h2>
-      <p>天気：{weatherData.weather[0].main}</p>
-      <p>気温:{weatherData?.main.temp} ℃</p>
-      <button onClick={handleAddToFavorites}>お気に入りに追加</button>
-        <img
-          src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`}
-          alt="weather icon"
-        />
-      </div>
+      <WeatherCard
+        weatherData={weatherData}
+        onAddFavorite={handleAddToFavorites}
+        isFavorite={favorites.includes(weatherData.name)}
+      />
     ) : (
     <p>{/*ここが天気の結果表示エリア*/}都市名を入力して検索してください。</p>
     )}

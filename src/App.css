@@ -21,7 +21,7 @@
   background-color: #6c6c6c;
 }
 
-.weather-result {
+.weather-card {
   margin-top: 30px;
   border: 1px solid #ccc;
   padding: 20px;
@@ -33,4 +33,10 @@
   color: #ffe375;
   font-weight: bold;
   margin-top: 20px;
+}
+
+.favorite-status {
+  font-weight: bold;
+  color: rgb(102, 194, 163);
+  margin-top: 10px;
 }
