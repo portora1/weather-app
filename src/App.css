@@ -40,3 +40,15 @@
   color: rgb(102, 194, 163);
   margin-top: 10px;
 }
+
+.dashboard {
+  margin-top: 30px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+  gap: 20px;
+  margin-top: 10px;
+  padding: - 20px;
+}

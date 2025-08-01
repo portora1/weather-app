@@ -3,11 +3,12 @@ import { type WeatherData } from '../App';
 
 type WeatherCardProps = {
   weatherData: WeatherData;
-  onAddFavorite: () => void;
+  onAddFavorite?: () => void;
+  onRemoveFavorite?: ()=> void;
   isFavorite: boolean;
 };
 
-export const WeatherCard = ({ weatherData, onAddFavorite, isFavorite }:
+export const WeatherCard = ({ weatherData, onAddFavorite, onRemoveFavorite, isFavorite }:
     WeatherCardProps) => {
     return (
         <div className="weather-card">
@@ -19,9 +20,9 @@ export const WeatherCard = ({ weatherData, onAddFavorite, isFavorite }:
         alt="weather icon"
       />
       {isFavorite ? (
-        <p className="favorite-status">お気に入り登録済み</p>
+        <button onClick={onRemoveFavorite}>お気に入りから削除</button>
       ) : (
-      <button onClick={onAddFavorite}>お気に入りに追加</button>
+      onAddFavorite && <button onClick={onAddFavorite}>お気に入りに追加</button>
           )}
         </div>
     );

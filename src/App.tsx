@@ -24,6 +24,8 @@ function App() {
     return saveFavorites ? JSON.parse(saveFavorites) : [];
   });
 
+  const [dashboardData,setDashboardData] = useState<WeatherData[]>([]);
+
   const [error, setError] = useState<string | null>(null);
 
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
@@ -64,9 +66,39 @@ function App() {
     setFavorites(favorites.filter(city => city !== cityToRemove));
   };
 
+  const fetchALLFavoritesWeather = async () => {
+    setError(null);
+    try {
+      const weatherPromises = favorites.map(city => {
+        const URL =
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=ja`;
+        return fetch(URL).then(res => {
+          if(!res.ok) {
+            throw new Error(`Faild to fetch weather for ${city}`);
+          }
+          return res.json();
+        });
+      });
+      const weatherResults = await Promise.all(weatherPromises);
+      setDashboardData(weatherResults);
+    } catch (error){
+      console.error("Failed to fetch favorites weather data", error);
+      setError("お気に入り都市の天気取得中にエラーが発生しました。");
+      setDashboardData([]);
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('weatherFavorites', JSON.stringify(favorites));
   }, [favorites]);
+
+  useEffect(() => {
+    if(favorites.length > 0) {
+      fetchALLFavoritesWeather();
+    } else {
+      setDashboardData([]);
+    }
+  },[favorites]);
 
   return (
     <div className="App">
@@ -80,32 +112,35 @@ function App() {
       />
       <button type="submit">検索</button>
       </form>
-      <div className="favolites-list">
-        <h3>お気に入りリスト</h3>
-        {favorites.length > 0 ? (
-          <ul>
-            {favorites.map((favCity) => (
-              <li key={favCity}>
-                <span className="favorite-city" onClick={() => handleSearch(favCity)}>
-                  {favCity}
-                </span>
-                <button onClick={() => handleRemoveFavorites(favCity)}>削除</button>
-              </li>
+
+      <div className="dashboard">
+        <h3>お気に入りダッシュボード</h3>
+        {dashboardData.length > 0 ? (
+          <div className="dashboard-grid">
+            {dashboardData.map(data => (
+              <WeatherCard
+                key={data.name}
+                weatherData={data}
+                isFavorite={true}
+              />
             ))}
-          </ul>
-            ) : (
-              <p>お気に入りの都市はありません。</p>
-            )}
+          </div>
+        ) : (
+          <p>お気に入りを登録すると、ここに一覧表示されます。</p>
+        )}
       </div>
+
       {error && <p className="error-message">{error}</p>}
-    {weatherData ? (
-      <WeatherCard
-        weatherData={weatherData}
-        onAddFavorite={handleAddToFavorites}
-        isFavorite={favorites.includes(weatherData.name)}
-      />
-    ) : (
-    <p>{/*ここが天気の結果表示エリア*/}都市名を入力して検索してください。</p>
+      {weatherData && (
+        <div className="search-result-area">
+          <h3>検索結果</h3>
+        <WeatherCard
+          weatherData={weatherData}
+          onAddFavorite={handleAddToFavorites}
+          isFavorite={favorites.includes(weatherData.name)}
+          onRemoveFavorite = {() => {handleRemoveFavorites(weatherData.name)}}
+        />
+      </div>
     )}
     </div>
   );
