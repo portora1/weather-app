@@ -28,7 +28,7 @@ function App() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const [suggestions, setsuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
 
@@ -37,7 +37,7 @@ function App() {
 
   const fetchSuggestions = async (inputValue: string) => {
     if(!inputValue) {
-      setsuggestions([]);
+      setSuggestions([]);
       return;
     }
     setIsSuggestionsLoading(true);
@@ -45,22 +45,22 @@ function App() {
   const URL =
   `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?minPopulation=100000&namePrefix=${inputValue}`;
   const options = {
-    methodo: 'GET',
+    method: 'GET',
     headers: {
-      'X-RapidAPIKey': GEODB_API_KEY,
-      'X-RapidAPI_Host': 'wft-geo-db.p.rapidapi.com'
+      'X-RapidAPI-Key': GEODB_API_KEY,
+      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
     }
   };
 
   try {
     const response = await fetch(URL,options);
     const result = await response.json();
-    const cityNames = result.data.map((setCity: any) =>
-    `${city.city},${city.countryCode}`);
-    setsuggestions(cityNames);
+    const cityNames = result.data.map((item: any) =>
+    `${item.city},${item.countryCode}`);
+    setSuggestions(cityNames);
   } catch(error) {
     console.error("Faild to fetch suggestions", error);
-    setsuggestions([]);
+    setSuggestions([]);
   } finally {
     setIsSuggestionsLoading(false);
   }
@@ -136,6 +136,18 @@ function App() {
     }
   },[favorites]);
 
+  useEffect(() => {
+    if (city.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+
+    const debounceTimer = setTimeout(() => {
+      fetchSuggestions(city);
+    }, 500);
+    return () => clearTimeout(debounceTimer);
+  },[city]);
+
   return (
     <div className="App">
       <h1>天気予報アプリ</h1>
@@ -145,9 +157,35 @@ function App() {
         value={city}
         onChange={(e) => setCity(e.target.value)}
         placeholder="都市名を入力してください"
+        onBlur={() => {
+          setTimeout(() => {
+            setSuggestions([]);
+          }, 150);
+        }}
       />
       <button type="submit">検索</button>
       </form>
+
+      {isSuggestionsLoading ? (
+        <div className="suggestions-list">Loading...</div>
+      ) : (
+        suggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {suggestions.map((suggestion)=> (
+              <li
+              key={suggestion}
+              onClick={() => {
+                handleSearch(suggestion);
+                setCity(suggestion);
+                //setSuggestions([]); サジェストがすぐに消えてしまうため、inputにsetTimeoutを追加
+              }}
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
+        ) 
+      )}
 
       <div className="dashboard">
         <h3>お気に入りダッシュボード</h3>
