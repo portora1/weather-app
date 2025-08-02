@@ -28,7 +28,43 @@ function App() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const [suggestions, setsuggestions] = useState<string[]>([]);
+
+  const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
+
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+  const GEODB_API_KEY = import.meta.env.VITE_GEODB_API_KEY;
+
+  const fetchSuggestions = async (inputValue: string) => {
+    if(!inputValue) {
+      setsuggestions([]);
+      return;
+    }
+    setIsSuggestionsLoading(true);
+  
+  const URL =
+  `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?minPopulation=100000&namePrefix=${inputValue}`;
+  const options = {
+    methodo: 'GET',
+    headers: {
+      'X-RapidAPIKey': GEODB_API_KEY,
+      'X-RapidAPI_Host': 'wft-geo-db.p.rapidapi.com'
+    }
+  };
+
+  try {
+    const response = await fetch(URL,options);
+    const result = await response.json();
+    const cityNames = result.data.map((setCity: any) =>
+    `${city.city},${city.countryCode}`);
+    setsuggestions(cityNames);
+  } catch(error) {
+    console.error("Faild to fetch suggestions", error);
+    setsuggestions([]);
+  } finally {
+    setIsSuggestionsLoading(false);
+  }
+  };
 
   const handleSearch = async(searchCity: string) => {
     if(!searchCity) return;
