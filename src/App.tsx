@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import './App.css';
 import { WeatherCard } from './components/WeatherCard';
+import { useDebounce } from "./hooks/useDebounce";
 
 export type WeatherData = {
   name: string;
@@ -31,6 +32,8 @@ function App() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
+
+  const debouncedSearchTerm = useDebounce(city, 500);
 
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
   const GEODB_API_KEY = import.meta.env.VITE_GEODB_API_KEY;
@@ -137,16 +140,25 @@ function App() {
   },[favorites]);
 
   useEffect(() => {
-    if (city.trim() === '') {
+    if(debouncedSearchTerm && debouncedSearchTerm !== weatherData?.name) {
+      fetchSuggestions(debouncedSearchTerm);
+    } else {
       setSuggestions([]);
-      return;
     }
+  }, [debouncedSearchTerm]);
 
-    const debounceTimer = setTimeout(() => {
-      fetchSuggestions(city);
-    }, 500);
-    return () => clearTimeout(debounceTimer);
-  },[city]);
+  // debounceTimer機能を丸ごと別のファイルに分けた為不要
+  // useEffect(() => {
+  //   if (city.trim() === '') {
+  //     setSuggestions([]);
+  //     return;
+  //   }
+
+  //   const debounceTimer = setTimeout(() => {
+  //     fetchSuggestions(city);
+  //   }, 500);
+  //   return () => clearTimeout(debounceTimer);
+  // },[city]);
 
   return (
     <div className="App">
@@ -157,11 +169,12 @@ function App() {
         value={city}
         onChange={(e) => setCity(e.target.value)}
         placeholder="都市名を入力してください"
-        onBlur={() => {
-          setTimeout(() => {
-            setSuggestions([]);
-          }, 150);
-        }}
+        // 追加してみたけどdebounced機能を別に設けて実装したので不要となった
+        // onBlur={() => {
+        //   setTimeout(() => {
+        //     setSuggestions([]);
+        //   }, 150);
+        // }}
       />
       <button type="submit">検索</button>
       </form>
@@ -177,7 +190,8 @@ function App() {
               onClick={() => {
                 handleSearch(suggestion);
                 setCity(suggestion);
-                //setSuggestions([]); サジェストがすぐに消えてしまうため、inputにsetTimeoutを追加
+                setSuggestions([]);
+                //setSuggestions([]); サジェストがすぐに消えてしまうため、inputにsetTimeoutを追加したがそれでも出来なかった
               }}
               >
                 {suggestion}
