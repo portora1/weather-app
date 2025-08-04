@@ -39,7 +39,7 @@ yarn dev
 or
 npm run dev
 ```
-ブラウザでhttp://localhost:5173にアクセスしてください。
+ブラウザでhttp://localhost:5173 にアクセスしてください。
 使用技術
 React
 TypeScript
