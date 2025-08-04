@@ -92,7 +92,7 @@ function App() {
       
       const geoDataArray = await geoResponse.json();
       if(geoDataArray.length === 0) {
-        throw new Error('都市が見つかりませんでした');
+        throw new Error('地域が見つかりませんでした');
       }
 
       const stateCounts: { [key: string]: number } = {};
@@ -130,7 +130,7 @@ function App() {
 
     } catch(error) {
       console.error("天気情報の取得に失敗しました:", error);
-    setError("都市が見つかりませんでした。「~市」「~区」などは含めず、都市名（例：東京、Fukuoka）で入力してください。");
+    setError("地域が見つかりませんでした。「~市」「~区」などは含めず、地域名（例：東京、Fukuoka）で入力してください。");
     setWeatherData(null);
     }
   };
@@ -168,7 +168,7 @@ function App() {
       setDashboardData(weatherResults);
     } catch (error){
       console.error("Failed to fetch favorites weather data", error);
-      setError("お気に入り都市の天気取得中にエラーが発生しました。");
+      setError("お気に入り地域の天気取得中にエラーが発生しました。");
       setDashboardData([]);
     }
   };
@@ -203,7 +203,7 @@ function App() {
         type="text"
         value={city}
         onChange={(e) => setCity(e.target.value)}
-        placeholder="都市名を入力してください"
+        placeholder="地域名を入力 福岡orFukuoka"
       />
       <button type="submit">検索</button>
       </form>
@@ -227,7 +227,7 @@ function App() {
                 </li>
               ))}
             </ul>
-            <p className="suggestions-note">候補にない都市は、直接入力して検索してください。</p>
+            <p className="suggestions-note">候補にない地域は、直接入力して検索してください。</p>
           </div>
         ) 
       )}
