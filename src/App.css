@@ -69,3 +69,9 @@
 .suggestions-list li:hover {
   background-color: #f0f0f0;
 }
+.suggestions-note {
+  font-size: 0.8em;
+  color: #888;
+  margin: 5px auto 0;
+  width: 216px;
+}

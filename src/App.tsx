@@ -212,20 +212,23 @@ function App() {
         <div className="suggestions-list">Loading...</div>
       ) : (
         suggestions.length > 0 && (
-          <ul className="suggestions-list">
-            {suggestions.map((suggestion)=> (
-              <li
-              key={suggestion}
-              onClick={async () => {
-                setSuggestions([]);
-                await handleSearch(suggestion);
-                setCity(suggestion);
-              }}
-              >
-                {suggestion}
-              </li>
-            ))}
-          </ul>
+          <div>
+            <ul className="suggestions-list">
+              {suggestions.map((suggestion)=> (
+                <li
+                key={suggestion}
+                onClick={async () => {
+                  setSuggestions([]);
+                  await handleSearch(suggestion);
+                  setCity(suggestion);
+                }}
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+            <p className="suggestions-note">候補にない都市は、直接入力して検索してください。</p>
+          </div>
         ) 
       )}
 
