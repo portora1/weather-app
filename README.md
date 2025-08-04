@@ -1,7 +1,6 @@
 # 天気アプリ (React + TypeScript + Vite)
 
-これは、React, TypeScript, Viteを使用して作成されたモダンな天気アプリです。
-指定した都市の現在の天気をリアルタイムで表示するほか、お気に入り登録や検索サジェストなどの機能を備えています。
+これは、React, TypeScript, Viteを使用して作成されたモダンな天気アプリです。指定した都市の現在の天気をリアルタイムで表示するほか、お気に入り登録や検索サジェストなどの機能を備えています。
 
 ## ✨ 主な機能
 
@@ -25,7 +24,6 @@ cd weather-app
 yarn install
 # または npm install
 Use code with caution.
-Markdown
 2. APIキーの準備
 このアプリケーションは、2つの外部APIサービスを利用しています。以下のリンクからそれぞれ無料で利用登録し、APIキーを取得してください。
 OpenWeatherMap API
@@ -63,4 +61,3 @@ Vite: 高速なフロントエンド開発環境
 OpenWeatherMap API: 天気情報・ジオコーディング
 GeoDB Cities API: 検索サジェスト
 Custom Hooks: useDebounceによるロジックの再利用
-
