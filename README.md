@@ -23,9 +23,9 @@ git clone https://github.com/portora1/weather-app.git
 cd weather-app
 yarn install
 # または npm install
-Use code with caution.
-2. APIキーの準備
-このアプリケーションは、2つの外部APIサービスを利用しています。以下のリンクからそれぞれ無料で利用登録し、APIキーを取得してください。
+
+###2. APIキーの準備
+このアプリケーションは、2つの外部APIサービスを利用しています。APIキーがないと動作しないため、以下の手順に従って取得と設定を行ってください。
 OpenWeatherMap API
 用途: 天気情報と、日本語都市名の緯度経度への変換（ジオコーディング）
 取得場所: OpenWeatherMap公式サイト
@@ -34,18 +34,19 @@ GeoDB Cities API
 用途: 都市名入力中の検索候補表示（サジェスト機能）
 取得場所: RapidAPI GeoDB Cities APIページ
 手順: RapidAPIにサインアップ（GitHubやGoogleアカウントでOK）し、ページ上の「Pricing」タブから無料の「Basic」プランにサブスクライブ（Subscribe）してください。その後、「Endpoints」タブに戻ると、X-RapidAPI-Keyとしてキーが表示されます。
-3. 環境変数の設定
+###3. 環境変数の設定
 取得した2つのAPIキーを、プロジェクトに設定します。
 1. .env.local ファイルの作成
 プロジェクトのルートディレクトリ（package.jsonファイルと同じ階層）に、.env.localという名前のファイルを新しく作成してください。
 2. APIキーの記述
 作成した.env.localファイルに、以下の内容をコピー＆ペーストし、...の部分を、あなたが取得した実際のAPIキーに置き換えてください。
+
 Generated .env.local
 VITE_OPENWEATHER_API_KEY=...ここにOpenWeatherMapのAPIキー...
 VITE_GEODB_API_KEY=...ここにRapidAPIのGeoDB APIキー...
 Use code with caution.
 .env.local
-⚠️注意: この.env.localファイルは、セキュリティのためにGitのバージョン管理から意図的に除外されています。APIキーなどの秘密の情報をGitHubに絶対にアップロードしないでください。
+⚠️ 注意: この.env.localファイルは、セキュリティのためにGitのバージョン管理から意図的に除外されています。APIキーなどの秘密の情報をGitHubに絶対にアップロードしないでください。
 4. 開発サーバーの起動
 すべての設定が完了したら、以下のコマンドで開発サーバーを起動します。
 Generated bash
