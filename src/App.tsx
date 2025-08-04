@@ -33,20 +33,25 @@ function App() {
 
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false);
 
-  const debouncedSearchTerm = useDebounce(city, 500);
+  const debouncedSearchTerm = useDebounce(city, 800);
 
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
   const GEODB_API_KEY = import.meta.env.VITE_GEODB_API_KEY;
 
   const fetchSuggestions = async (inputValue: string) => {
-    if(!inputValue) {
+    if(inputValue.length < 2) {
       setSuggestions([]);
       return;
     }
     setIsSuggestionsLoading(true);
-  
-  const URL =
-  `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?minPopulation=100000&namePrefix=${inputValue}`;
+  const baseUrl = 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities';
+  const params = new URLSearchParams({
+    countryIds: 'JP',
+    namePrefix: inputValue,
+    languageCodo: 'ja',
+  });
+
+  const URL = `${baseUrl}?${params.toString()}`;
   const options = {
     method: 'GET',
     headers: {
@@ -57,9 +62,11 @@ function App() {
 
   try {
     const response = await fetch(URL,options);
+      if(!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
     const result = await response.json();
-    const cityNames = result.data.map((item: any) =>
-    `${item.city},${item.countryCode}`);
+    const cityNames = result.data?.map((item: any) => item.city)|| [];
     setSuggestions(cityNames);
   } catch(error) {
     console.error("Faild to fetch suggestions", error);
@@ -71,24 +78,63 @@ function App() {
 
   const handleSearch = async(searchCity: string) => {
     if(!searchCity) return;
+    setSuggestions([]);
     setError(null);
-    setWeatherData(null);
-
-    const URL = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${API_KEY}&units=metric&lang=ja`;
 
     try {
-      const response = await fetch(URL);
-      if(!response.ok) {
-      throw new Error ('都市が見つかりませんでした');
+      const encodedSearchCity = encodeURIComponent(searchCity);
+      const geocodingUrl =
+     `https://api.openweathermap.org/geo/1.0/direct?q=${encodedSearchCity},JP&limit=5&appid=${API_KEY}`;
+      const geoResponse = await fetch(geocodingUrl);
+      if(!geoResponse.ok) {
+        throw new Error ('Geocoding API request failed');
       }
-      const data: WeatherData = await response.json();
-      setWeatherData(data);
-      console.log(data);
-    } catch (error) {
+      
+      const geoDataArray = await geoResponse.json();
+      if(geoDataArray.length === 0) {
+        throw new Error('都市が見つかりませんでした');
+      }
+
+      const stateCounts: { [key: string]: number } = {};
+      geoDataArray.forEach((item: any) => {
+        if(item.state){
+          stateCounts[item.state] = (stateCounts[item.state] || 0) + 1;
+        }
+      });
+      
+      let bestState = '';
+      let maxCount = 0;
+      for (const state in stateCounts) {
+        if(stateCounts[state] > maxCount){
+          maxCount = stateCounts[state];
+          bestState = state;
+        }
+      }
+
+      const bestMach = geoDataArray.find((item: any) => item.state === bestState) || geoDataArray[0];
+
+      const { lat, lon } = bestMach;
+
+      const weatherUrl = 
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=ja`;
+      
+      const weatherResponse = await fetch(weatherUrl);
+      if(!weatherResponse.ok) {
+        throw new Error('Weather fetch failed');
+      }
+      
+      const data: WeatherData = await weatherResponse.json();
+
+      const displayData = { ...data, name: searchCity};
+      setWeatherData(displayData);
+
+    } catch(error) {
       console.error("天気情報の取得に失敗しました:", error);
-      setError("都市が見つかりませんでした。入力内容を確認して再度お試しください。");
+    setError("都市が見つかりませんでした。「~市」「~区」などは含めず、都市名（例：東京、Fukuoka）で入力してください。");
+    setWeatherData(null);
     }
   };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleSearch(city);
@@ -140,25 +186,14 @@ function App() {
   },[favorites]);
 
   useEffect(() => {
-    if(debouncedSearchTerm && debouncedSearchTerm !== weatherData?.name) {
+    if(debouncedSearchTerm) {
       fetchSuggestions(debouncedSearchTerm);
     } else {
       setSuggestions([]);
     }
   }, [debouncedSearchTerm]);
 
-  // debounceTimer機能を丸ごと別のファイルに分けた為不要
-  // useEffect(() => {
-  //   if (city.trim() === '') {
-  //     setSuggestions([]);
-  //     return;
-  //   }
 
-  //   const debounceTimer = setTimeout(() => {
-  //     fetchSuggestions(city);
-  //   }, 500);
-  //   return () => clearTimeout(debounceTimer);
-  // },[city]);
 
   return (
     <div className="App">
@@ -169,12 +204,6 @@ function App() {
         value={city}
         onChange={(e) => setCity(e.target.value)}
         placeholder="都市名を入力してください"
-        // 追加してみたけどdebounced機能を別に設けて実装したので不要となった
-        // onBlur={() => {
-        //   setTimeout(() => {
-        //     setSuggestions([]);
-        //   }, 150);
-        // }}
       />
       <button type="submit">検索</button>
       </form>
@@ -187,11 +216,10 @@ function App() {
             {suggestions.map((suggestion)=> (
               <li
               key={suggestion}
-              onClick={() => {
-                handleSearch(suggestion);
-                setCity(suggestion);
+              onClick={async () => {
                 setSuggestions([]);
-                //setSuggestions([]); サジェストがすぐに消えてしまうため、inputにsetTimeoutを追加したがそれでも出来なかった
+                await handleSearch(suggestion);
+                setCity(suggestion);
               }}
               >
                 {suggestion}
